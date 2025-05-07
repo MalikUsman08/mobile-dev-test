@@ -1,0 +1,7 @@
+{
+  "name": "donation-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
