@@ -16,8 +16,6 @@ import {
   RefresherEventDetail,
   useIonViewDidEnter,
 } from '@ionic/react';
-import { FixedSizeList } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
 import { DonationItem as DonationItemComponent } from '../components/DonationItem';
 import { useDonations } from '../hooks/useDonations';
 
@@ -66,24 +64,6 @@ const DonationList: React.FC = () => {
     }
   };
 
-  const renderDonationItem = ({
-    index,
-    style,
-  }: {
-    index: number;
-    style: React.CSSProperties;
-  }) => {
-    const donation = donations[index];
-    return (
-      <div style={style}>
-        <DonationItemComponent
-          donation={donation}
-          onDelete={() => handleDelete(donation.id)}
-        />
-      </div>
-    );
-  };
-
   return (
     <IonPage>
       <IonHeader>
@@ -130,19 +110,14 @@ const DonationList: React.FC = () => {
         )}
 
         {!loading && !error && donations.length > 0 && (
-          <div style={{ height: 'calc(100vh - 56px)' }}>
-            <AutoSizer>
-              {({ height, width }) => (
-                <FixedSizeList
-                  height={height}
-                  width={width}
-                  itemCount={donations.length}
-                  itemSize={100}
-                >
-                  {renderDonationItem}
-                </FixedSizeList>
-              )}
-            </AutoSizer>
+          <div style={{ padding: '8px 0' }}>
+            {donations.map((donation) => (
+              <DonationItemComponent
+                key={donation.id}
+                donation={donation}
+                onDelete={() => handleDelete(donation.id)}
+              />
+            ))}
           </div>
         )}
       </IonContent>

@@ -27,27 +27,39 @@ export const DonationItem: React.FC<DonationItemProps> = ({
 }) => {
   return (
     <IonItemSliding>
-      <IonItem>
-        <IonLabel>
-          <h2 style={{ marginBottom: '8px' }}>{donation.name}</h2>
+      <IonItem lines='full'>
+        <IonLabel className='ion-padding-vertical'>
+          <h2
+            style={{
+              marginBottom: '12px',
+              fontSize: '1.1rem',
+              fontWeight: '500',
+            }}
+          >
+            {donation.name}
+          </h2>
           <div
             style={{
               display: 'flex',
               flexWrap: 'wrap',
               gap: '8px',
               marginBottom: '8px',
+              alignItems: 'center',
             }}
           >
-            <IonChip color='primary'>
-              <IonIcon icon={cashOutline} />
+            <IonChip color='primary' style={{ margin: '2px' }}>
+              <IonIcon icon={cashOutline} style={{ marginRight: '4px' }} />
               <IonLabel>{donation.price?.text || 'No price'}</IonLabel>
             </IonChip>
-            <IonChip color='secondary'>
-              <IonIcon icon={locationOutline} />
+            <IonChip color='secondary' style={{ margin: '2px' }}>
+              <IonIcon icon={locationOutline} style={{ marginRight: '4px' }} />
               <IonLabel>{donation.location?.name || 'No location'}</IonLabel>
             </IonChip>
-            <IonChip color='tertiary'>
-              <IonIcon icon={colorPaletteOutline} />
+            <IonChip color='tertiary' style={{ margin: '2px' }}>
+              <IonIcon
+                icon={colorPaletteOutline}
+                style={{ marginRight: '4px' }}
+              />
               <IonLabel>{donation.theme?.name || 'No theme'}</IonLabel>
             </IonChip>
             <IonChip
@@ -58,13 +70,23 @@ export const DonationItem: React.FC<DonationItemProps> = ({
                   ? 'danger'
                   : 'warning'
               }
+              style={{ margin: '2px' }}
             >
-              <IonIcon icon={informationCircleOutline} />
+              <IonIcon
+                icon={informationCircleOutline}
+                style={{ marginRight: '4px' }}
+              />
               <IonLabel>{donation.status.name}</IonLabel>
             </IonChip>
           </div>
           {donation.reference && (
-            <p style={{ fontSize: '0.9em', color: 'var(--ion-color-medium)' }}>
+            <p
+              style={{
+                fontSize: '0.9em',
+                color: 'var(--ion-color-medium)',
+                margin: '4px 0 0 0',
+              }}
+            >
               Reference: {donation.reference.text}
             </p>
           )}
