@@ -3,6 +3,7 @@ import { API_ENDPOINTS, API_HEADERS } from '../constants/api';
 
 export const donationService = {
   async getAllDonations(): Promise<DonationItem[]> {
+    console.log('API Call: Getting all donations');
     const response = await fetch(API_ENDPOINTS.DONATIONS.ALL, {
       method: 'GET',
       headers: API_HEADERS,
@@ -13,22 +14,60 @@ export const donationService = {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    console.log('API Response - All donations:', data);
+    return data;
   },
 
   async createDonation(donation: NewDonationItem): Promise<DonationItem> {
-    const response = await fetch(API_ENDPOINTS.DONATIONS.CREATE, {
-      method: 'POST',
-      headers: API_HEADERS,
-      body: JSON.stringify(donation),
-      mode: 'cors',
-    });
+    try {
+      // Transform the data to match the API schema
+      const requestData = {
+        name: donation.name,
+        location: donation.location,
+        theme: donation.theme,
+        price: {
+          currencyCode: donation.price.currencyCode,
+          amount: donation.price.amount,
+        },
+      };
 
-    if (!response.ok) {
-      throw new Error('Failed to create donation');
+      console.log(
+        'API Call: Creating donation with transformed data:',
+        JSON.stringify(requestData, null, 2)
+      );
+      console.log('Request URL:', API_ENDPOINTS.DONATIONS.CREATE);
+      console.log('Request Headers:', API_HEADERS);
+
+      const response = await fetch(API_ENDPOINTS.DONATIONS.CREATE, {
+        method: 'POST',
+        headers: API_HEADERS,
+        body: JSON.stringify(requestData),
+        mode: 'cors',
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText,
+        });
+        throw new Error(
+          `Failed to create donation: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const createdDonation = await response.json();
+      console.log(
+        'API Response - Created donation:',
+        JSON.stringify(createdDonation, null, 2)
+      );
+      return createdDonation;
+    } catch (error) {
+      console.error('Error in createDonation:', error);
+      throw error;
     }
-
-    return response.json();
   },
 
   async deleteDonation(id: string): Promise<void> {

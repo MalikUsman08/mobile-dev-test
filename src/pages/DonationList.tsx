@@ -14,6 +14,7 @@ import {
   IonSpinner,
   IonAlert,
   RefresherEventDetail,
+  useIonViewDidEnter,
 } from '@ionic/react';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -35,6 +36,11 @@ const DonationList: React.FC = () => {
   useEffect(() => {
     fetchDonations();
   }, [fetchDonations]);
+
+  // This will run every time the view enters
+  useIonViewDidEnter(() => {
+    fetchDonations();
+  });
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     try {

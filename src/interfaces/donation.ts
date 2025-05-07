@@ -44,16 +44,13 @@ export interface DonationItem {
 }
 
 export interface NewPrice {
-  currency: {
-    id: string;
-    symbol: string;
-  };
-  amount: number;
+  currencyCode: string | null;
+  amount: number | null;
 }
 
 export interface NewDonationItem {
   name: string;
-  locationId: string;
-  themeId: string;
+  location: string | null;
+  theme: string | null;
   price: NewPrice;
 }

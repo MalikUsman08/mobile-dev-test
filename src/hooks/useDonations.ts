@@ -12,9 +12,12 @@ export const useDonations = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('Fetching all donations...');
       const data = await donationService.getAllDonations();
+      console.log('Fetched donations:', data);
       setDonations(data);
     } catch (err) {
+      console.error('Error fetching donations:', err);
       setError(
         err instanceof Error ? err.message : 'Failed to fetch donations'
       );
@@ -27,10 +30,13 @@ export const useDonations = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('Creating donation with data:', donation);
       const newDonation = await donationService.createDonation(donation);
+      console.log('Donation created with response:', newDonation);
       setDonations((prev) => [...prev, newDonation]);
       return newDonation;
     } catch (err) {
+      console.error('Error creating donation:', err);
       setError(
         err instanceof Error ? err.message : 'Failed to create donation'
       );

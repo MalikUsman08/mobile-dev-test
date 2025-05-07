@@ -5,8 +5,16 @@ import {
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
+  IonChip,
+  IonIcon,
 } from '@ionic/react';
 import { DonationItem as DonationItemType } from '../interfaces/donation';
+import {
+  locationOutline,
+  colorPaletteOutline,
+  cashOutline,
+  informationCircleOutline,
+} from 'ionicons/icons';
 
 export interface DonationItemProps {
   donation: DonationItemType;
@@ -21,12 +29,45 @@ export const DonationItem: React.FC<DonationItemProps> = ({
     <IonItemSliding>
       <IonItem>
         <IonLabel>
-          <h2>{donation.name}</h2>
-          {donation.reference && <p>Reference: {donation.reference.text}</p>}
-          {donation.price && <p>Price: {donation.price.text}</p>}
-          <p>Status: {donation.status.name}</p>
-          {donation.location && <p>Location: {donation.location.name}</p>}
-          {donation.theme && <p>Theme: {donation.theme.name}</p>}
+          <h2 style={{ marginBottom: '8px' }}>{donation.name}</h2>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '8px',
+              marginBottom: '8px',
+            }}
+          >
+            <IonChip color='primary'>
+              <IonIcon icon={cashOutline} />
+              <IonLabel>{donation.price?.text || 'No price'}</IonLabel>
+            </IonChip>
+            <IonChip color='secondary'>
+              <IonIcon icon={locationOutline} />
+              <IonLabel>{donation.location?.name || 'No location'}</IonLabel>
+            </IonChip>
+            <IonChip color='tertiary'>
+              <IonIcon icon={colorPaletteOutline} />
+              <IonLabel>{donation.theme?.name || 'No theme'}</IonLabel>
+            </IonChip>
+            <IonChip
+              color={
+                donation.status.name === 'Approved'
+                  ? 'success'
+                  : donation.status.name === 'Rejected'
+                  ? 'danger'
+                  : 'warning'
+              }
+            >
+              <IonIcon icon={informationCircleOutline} />
+              <IonLabel>{donation.status.name}</IonLabel>
+            </IonChip>
+          </div>
+          {donation.reference && (
+            <p style={{ fontSize: '0.9em', color: 'var(--ion-color-medium)' }}>
+              Reference: {donation.reference.text}
+            </p>
+          )}
         </IonLabel>
       </IonItem>
       <IonItemOptions side='end'>

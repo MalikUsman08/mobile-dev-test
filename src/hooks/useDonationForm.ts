@@ -1,116 +1,92 @@
 import { useState, useCallback } from 'react';
-import { NewDonationItem, Currency } from '../interfaces/donation';
+import { useDonations } from './useDonations';
+import { NewDonationItem } from '../interfaces/donation';
 
 interface FormData {
   name: string;
-  locationId: string;
-  themeId: string;
+  location: string;
+  theme: string;
   price: {
+    currencyCode: string;
     amount: number;
-    currency: Currency;
   };
 }
 
 interface FormErrors {
   name?: string;
+  location?: string;
+  theme?: string;
   price?: string;
-  currency?: string;
-  locationId?: string;
-  themeId?: string;
 }
 
 export const useDonationForm = () => {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    locationId: '',
-    themeId: '',
-    price: {
-      amount: 0,
-      currency: { id: 'EUR', symbol: '€' },
-    },
-  });
-
+  const { createDonation } = useDonations();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validateForm = useCallback((): boolean => {
+  const validateForm = (data: FormData): FormErrors => {
     const newErrors: FormErrors = {};
 
-    if (!formData.name.trim()) {
+    if (!data.name.trim()) {
       newErrors.name = 'Name is required';
     }
 
-    if (formData.price.amount <= 0) {
+    if (!data.location) {
+      newErrors.location = 'Location is required';
+    }
+
+    if (!data.theme) {
+      newErrors.theme = 'Theme is required';
+    }
+
+    if (!data.price.amount || data.price.amount <= 0) {
       newErrors.price = 'Price must be greater than 0';
     }
 
-    if (!formData.price.currency) {
-      newErrors.currency = 'Currency is required';
-    }
+    return newErrors;
+  };
 
-    if (!formData.locationId) {
-      newErrors.locationId = 'Location is required';
-    }
+  const handleSubmit = useCallback(
+    async (data: FormData) => {
+      try {
+        setError(null);
+        setErrors({});
+        setIsSubmitting(true);
 
-    if (!formData.themeId) {
-      newErrors.themeId = 'Theme is required';
-    }
+        const validationErrors = validateForm(data);
+        if (Object.keys(validationErrors).length > 0) {
+          setErrors(validationErrors);
+          return;
+        }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [formData]);
+        const newDonation: NewDonationItem = {
+          name: data.name,
+          location: data.location || null,
+          theme: data.theme || null,
+          price: {
+            currencyCode: 'GBP',
+            amount: data.price.amount || null,
+          },
+        };
 
-  const handleInputChange = useCallback(
-    (field: keyof FormData, value: string | number) => {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
+        console.log('Submitting donation:', newDonation);
+        await createDonation(newDonation);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to create donation'
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     },
-    []
+    [createDonation]
   );
-
-  const handlePriceChange = useCallback(
-    (field: 'amount' | 'currency', value: number | Currency) => {
-      setFormData((prev) => ({
-        ...prev,
-        price: {
-          ...prev.price,
-          [field]: value,
-        },
-      }));
-    },
-    []
-  );
-
-  const resetForm = useCallback(() => {
-    setFormData({
-      name: '',
-      locationId: '',
-      themeId: '',
-      price: {
-        amount: 0,
-        currency: { id: 'EUR', symbol: '€' },
-      },
-    });
-    setErrors({});
-  }, []);
-
-  const getNewDonationItem = useCallback((): NewDonationItem => {
-    return {
-      name: formData.name,
-      locationId: formData.locationId,
-      themeId: formData.themeId,
-      price: formData.price,
-    };
-  }, [formData]);
 
   return {
-    formData,
+    handleSubmit,
+    isSubmitting,
+    error,
     errors,
-    validateForm,
-    handleInputChange,
-    handlePriceChange,
-    resetForm,
-    getNewDonationItem,
   };
 };
