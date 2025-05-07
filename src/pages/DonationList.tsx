@@ -85,7 +85,7 @@ const DonationList: React.FC = () => {
             >
               <IonSelectOption value='all'>All</IonSelectOption>
               <IonSelectOption value='pending'>Pending</IonSelectOption>
-              <IonSelectOption value='approved'>Approved</IonSelectOption>
+              <IonSelectOption value='active'>Active</IonSelectOption>
               <IonSelectOption value='rejected'>Rejected</IonSelectOption>
             </IonSelect>
             <IonButton onClick={handleReset}>Reset</IonButton>

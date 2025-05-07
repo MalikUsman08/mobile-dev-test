@@ -1,12 +1,14 @@
 import { useState, useCallback } from 'react';
-import { DonationItem, NewDonationItem, Status } from '../interfaces/donation';
+import { DonationItem, NewDonationItem } from '../interfaces/donation';
 import { donationService } from '../services/donationService';
+
+type StatusFilter = 'all' | 'pending' | 'active' | 'rejected';
 
 export const useDonations = () => {
   const [donations, setDonations] = useState<DonationItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<Status | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   const fetchDonations = useCallback(async () => {
     try {
@@ -79,7 +81,9 @@ export const useDonations = () => {
   }, [fetchDonations]);
 
   const filteredDonations = donations.filter(
-    (donation) => statusFilter === 'all' || donation.status === statusFilter
+    (donation) =>
+      statusFilter === 'all' ||
+      donation.status.name.toLowerCase() === statusFilter.toLowerCase()
   );
 
   return {
