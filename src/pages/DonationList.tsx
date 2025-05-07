@@ -5,7 +5,6 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonButtons,
   IonButton,
   IonSelect,
   IonSelectOption,
@@ -69,7 +68,16 @@ const DonationList: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>Donation List</IonTitle>
-          <IonButtons slot='end'>
+        </IonToolbar>
+        <IonToolbar>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+            }}
+          >
             <IonSelect
               value={statusFilter}
               onIonChange={(e) => setStatusFilter(e.detail.value)}
@@ -81,7 +89,7 @@ const DonationList: React.FC = () => {
               <IonSelectOption value='rejected'>Rejected</IonSelectOption>
             </IonSelect>
             <IonButton onClick={handleReset}>Reset</IonButton>
-          </IonButtons>
+          </div>
         </IonToolbar>
       </IonHeader>
       <IonContent>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   IonContent,
   IonPage,
@@ -26,7 +26,7 @@ interface FormData {
   theme: string;
   price: {
     currencyCode: string;
-    amount: string;
+    amount: number;
   };
 }
 
@@ -36,7 +36,7 @@ const initialFormData: FormData = {
   theme: '',
   price: {
     currencyCode: 'GBP',
-    amount: '',
+    amount: 0,
   },
 };
 
@@ -46,6 +46,7 @@ const AddDonation: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
   const [themes, setThemes] = useState<Theme[]>([]);
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const latestFormData = useRef<FormData>(formData);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,35 +64,48 @@ const AddDonation: React.FC = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    latestFormData.current = formData;
+  }, [formData]);
+
   const handleInputChange = (field: string, value: string) => {
     if (field === 'price.amount') {
-      setFormData((prev) => ({
-        ...prev,
+      const numericValue = value === '' ? 0 : Number(value);
+      const newState = {
+        ...formData,
         price: {
-          ...prev.price,
-          amount: value,
+          ...formData.price,
+          amount: numericValue,
         },
-      }));
+      };
+      setFormData(newState);
+      latestFormData.current = newState;
     } else {
-      setFormData((prev) => ({
-        ...prev,
+      const newState = {
+        ...formData,
         [field]: value,
-      }));
+      };
+      setFormData(newState);
+      latestFormData.current = newState;
     }
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     const submissionData = {
-      ...formData,
+      ...latestFormData.current,
       price: {
-        ...formData.price,
-        amount:
-          formData.price.amount === '' ? 0 : Number(formData.price.amount),
+        ...latestFormData.current.price,
+        amount: Number(latestFormData.current.price.amount),
       },
     };
-    await handleSubmit(submissionData);
-    if (!error) {
+
+    const result = await handleSubmit(submissionData);
+
+    if (result) {
       setFormData(initialFormData);
+      latestFormData.current = initialFormData;
       history.goBack();
     }
   };
@@ -107,18 +121,15 @@ const AddDonation: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit();
-          }}
-        >
+        <form onSubmit={onSubmit}>
           <IonList>
             <IonItem>
               <IonLabel position='stacked'>Name</IonLabel>
               <IonInput
                 value={formData.name}
-                onIonChange={(e) => handleInputChange('name', e.detail.value!)}
+                onIonChange={(e) =>
+                  handleInputChange('name', e.detail.value || '')
+                }
                 placeholder='Enter donation name'
               />
             </IonItem>
@@ -133,7 +144,7 @@ const AddDonation: React.FC = () => {
               <IonSelect
                 value={formData.location}
                 onIonChange={(e) =>
-                  handleInputChange('location', e.detail.value)
+                  handleInputChange('location', e.detail.value || '')
                 }
                 placeholder='Select a location'
               >
@@ -154,7 +165,9 @@ const AddDonation: React.FC = () => {
               <IonLabel position='stacked'>Theme</IonLabel>
               <IonSelect
                 value={formData.theme}
-                onIonChange={(e) => handleInputChange('theme', e.detail.value)}
+                onIonChange={(e) =>
+                  handleInputChange('theme', e.detail.value || '')
+                }
                 placeholder='Select a theme'
               >
                 {themes.map((theme) => (

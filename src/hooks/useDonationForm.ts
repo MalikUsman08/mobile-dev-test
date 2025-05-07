@@ -40,6 +40,12 @@ export const useDonationForm = () => {
       newErrors.theme = 'Theme is required';
     }
 
+    console.log(
+      '[validateForm] price.amount value:',
+      data.price.amount,
+      'type:',
+      typeof data.price.amount
+    );
     if (!data.price.amount || data.price.amount <= 0) {
       newErrors.price = 'Price must be greater than 0';
     }
@@ -57,7 +63,7 @@ export const useDonationForm = () => {
         const validationErrors = validateForm(data);
         if (Object.keys(validationErrors).length > 0) {
           setErrors(validationErrors);
-          return;
+          return null;
         }
 
         const newDonation: NewDonationItem = {
@@ -71,11 +77,13 @@ export const useDonationForm = () => {
         };
 
         console.log('Submitting donation:', newDonation);
-        await createDonation(newDonation);
+        const created = await createDonation(newDonation);
+        return created;
       } catch (err) {
         setError(
           err instanceof Error ? err.message : 'Failed to create donation'
         );
+        return null;
       } finally {
         setIsSubmitting(false);
       }
